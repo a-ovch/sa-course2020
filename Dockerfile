@@ -5,8 +5,10 @@ RUN go mod download
 COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo .
 
-FROM alpine:latest
-RUN apk --no-cache add ca-certificates
+FROM alpine:3.11.5
+RUN apk --no-cache add ca-certificates \
+    && adduser -D healthcheck
+USER healthcheck
 WORKDIR /app
 COPY --from=builder /app/healthcheck .
 EXPOSE 8000
