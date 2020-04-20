@@ -6,8 +6,8 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo .
 
 FROM alpine:3.11.5
-RUN adduser -D healthcheck
-USER healthcheck
+RUN adduser -D app-executor
+USER app-executor
 WORKDIR /app
 COPY --from=builder /app/sa-course-app .
 EXPOSE 8000
