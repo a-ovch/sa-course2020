@@ -1,4 +1,4 @@
-module users
+module sa-course-app
 
 go 1.14
 

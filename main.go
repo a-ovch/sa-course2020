@@ -15,11 +15,6 @@ import (
 
 const portEnvVar = "SERVICE_PORT"
 
-func healthHandler(w http.ResponseWriter, _ *http.Request) {
-	w.Header().Add("Content-Type", "application/json")
-	_, _ = fmt.Fprint(w, "{\"status\": \"OK\"}")
-}
-
 func httpLogMiddleware(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("%v %v\n", r.Method, r.URL)
@@ -27,8 +22,18 @@ func httpLogMiddleware(h http.Handler) http.Handler {
 	})
 }
 
+func readyHandler(w http.ResponseWriter, _ *http.Request) {
+	w.Header().Set("Status", "200")
+}
+
+func healthHandler(w http.ResponseWriter, _ *http.Request) {
+	w.Header().Add("Content-Type", "application/json")
+	_, _ = fmt.Fprint(w, "{\"status\": \"OK\"}")
+}
+
 func startHttpServer() *http.Server {
 	r := mux.NewRouter()
+	r.HandleFunc("/ready", readyHandler).Methods(http.MethodGet)
 	r.HandleFunc("/health", healthHandler).Methods(http.MethodGet)
 
 	port := os.Getenv(portEnvVar)

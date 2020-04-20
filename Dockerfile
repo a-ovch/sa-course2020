@@ -9,6 +9,7 @@ FROM alpine:3.11.5
 RUN adduser -D healthcheck
 USER healthcheck
 WORKDIR /app
-COPY --from=builder /app/healthcheck .
+COPY --from=builder /app/sa-course-app .
 EXPOSE 8000
-CMD ["./healthcheck"]
+ENV SERVICE_PORT 8000
+CMD ["./sa-course-app"]
