@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sa-course-app-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sa-course-app
+  template:
+    metadata:
+      labels:
+        app: sa-course-app
+    spec:
+      containers:
+        - name: sa-course-app
+          image: andyovch/sa-course-app:v2
+          ports:
+            - name: web
+              containerPort: 8000
+          livenessProbe:
+            httpGet:
+              port: web
+              path: /health
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 2
+          readinessProbe:
+            httpGet:
+              port: web
+              path: /ready
+            initialDelaySeconds: 10
+            periodSeconds: 5

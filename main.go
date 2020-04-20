@@ -22,8 +22,9 @@ func httpLogMiddleware(h http.Handler) http.Handler {
 	})
 }
 
-func readyHandler(w http.ResponseWriter, _ *http.Request) {
-	w.Header().Set("Status", "200")
+func readyHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Content-Type", "application/json")
+	_, _ = fmt.Fprintf(w, "{\"host\": \"%v\"}", r.Host)
 }
 
 func healthHandler(w http.ResponseWriter, _ *http.Request) {
