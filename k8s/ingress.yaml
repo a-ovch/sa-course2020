@@ -7,10 +7,10 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   rules:
-  - host: arch.homework
-    http:
-      paths:
-        - path: /otusapp($|/)(.*)
-          backend:
-            serviceName: sa-course-app-service
-            servicePort: 9000
+    - host: arch.homework
+      http:
+        paths:
+          - path: /otusapp($|/)(.*)
+            backend:
+              serviceName: sa-course-app-service
+              servicePort: 9000

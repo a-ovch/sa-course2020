@@ -10,6 +10,4 @@ RUN adduser -D app-executor
 USER app-executor
 WORKDIR /app
 COPY --from=builder /app/sa-course-app .
-EXPOSE 8000
-ENV SERVICE_PORT 8000
 CMD ["./sa-course-app"]

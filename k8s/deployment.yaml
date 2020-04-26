@@ -14,7 +14,10 @@ spec:
     spec:
       containers:
         - name: sa-course-app
-          image: andyovch/sa-course-app:v2
+          image: andyovch/sa-course-app:v3
+          env:
+            - name: SERVICE_PORT
+              value: "8000"
           ports:
             - name: web
               containerPort: 8000
