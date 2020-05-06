@@ -45,8 +45,37 @@ func (h *handlers) createUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *handlers) updateUserHandler(w http.ResponseWriter, _ *http.Request) {
-	_, _ = fmt.Fprint(w, "Update: OK")
+func (h *handlers) updateUserHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+	uid, err := uuid.Parse(id)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		log.Printf("Invalid id \"%s\"", id)
+		return
+	}
+
+	decoder := json.NewDecoder(r.Body)
+	decoder.DisallowUnknownFields()
+
+	var userData app.UserData
+
+	err = decoder.Decode(&userData)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_, _ = fmt.Fprintf(w, "%v", err)
+		return
+	}
+
+	err = h.s.UpdateUser(domain.UserID(uid), &userData)
+	if err == app.ErrUserNotFound {
+		w.WriteHeader(http.StatusNotFound)
+	} else if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
+
 }
 
 func (h *handlers) getUserHandler(w http.ResponseWriter, r *http.Request) {
@@ -80,6 +109,22 @@ func (h *handlers) getUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *handlers) deleteUserHandler(w http.ResponseWriter, _ *http.Request) {
-	_, _ = fmt.Fprint(w, "Delete: OK")
+func (h *handlers) deleteUserHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+	uid, err := uuid.Parse(id)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		log.Printf("Invalid id \"%s\"", id)
+		return
+	}
+
+	err = h.s.DeleteUser(domain.UserID(uid))
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Printf("%v", err)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }

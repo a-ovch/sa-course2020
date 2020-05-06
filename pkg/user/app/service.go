@@ -44,6 +44,29 @@ func (s *Service) FindUser(id domain.UserID) (*UserData, error) {
 	}, nil
 }
 
+func (s *Service) UpdateUser(id domain.UserID, data *UserData) error {
+	u, err := s.repo.Find(id)
+	if err != nil {
+		return err
+	}
+
+	if u == nil {
+		return ErrUserNotFound
+	}
+
+	u.SetUsername(data.Username)
+	u.SetFirstName(data.FirstName)
+	u.SetLastName(data.LastName)
+	u.SetEmail(data.Email)
+	u.SetPhone(data.Phone)
+
+	return s.repo.Store(u)
+}
+
+func (s *Service) DeleteUser(id domain.UserID) error {
+	return s.repo.Delete(id)
+}
+
 func NewService(r domain.UserRepository) *Service {
 	return &Service{repo: r}
 }
