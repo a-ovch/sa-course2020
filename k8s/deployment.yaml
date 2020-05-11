@@ -18,17 +18,35 @@ spec:
           imagePullPolicy: "Always"
           env:
             - name: SAAPP_PORT
-              value: "8000"
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: APP_PORT
             - name: SAAPP_DB_HOST
-              value: "mysql"
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: DB_HOST
             - name: SAAPP_DB_PORT
-              value: "3306"
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: DB_PORT
             - name: SAAPP_DB_USER
-              value: "root"
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: DB_USER
             - name: SAAPP_DB_PASSWORD
-              value: "12345Q"
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: DB_PASSWORD
             - name: SAAPP_DB_NAME
-              value: "sa-app"
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: DB_NAME
           ports:
             - name: web
               containerPort: 8000

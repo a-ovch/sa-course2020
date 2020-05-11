@@ -35,9 +35,15 @@ spec:
               name: db
           env:
             - name: MYSQL_ROOT_PASSWORD
-              value: 12345Q
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: DB_PASSWORD
             - name: MYSQL_DATABASE
-              value: sa-app
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: DB_NAME
           volumeMounts:
             - name: mysqldb
               mountPath: /var/lib/mysql

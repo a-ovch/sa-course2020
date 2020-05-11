@@ -14,13 +14,28 @@ spec:
           imagePullPolicy: "Always"
           env:
             - name: DB_HOST
-              value: "mysql"
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: DB_HOST
             - name: DB_PORT
-              value: "3306"
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: DB_PORT
             - name: DB_USER
-              value: "root"
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: DB_USER
             - name: DB_PASSWORD
-              value: "12345Q"
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: DB_PASSWORD
             - name: DB_NAME
-              value: "sa-app"
-  backoffLimit: 0
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: DB_NAME
+  backoffLimit: 2
