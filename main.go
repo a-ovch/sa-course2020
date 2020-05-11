@@ -11,12 +11,22 @@ import (
 	"syscall"
 
 	"github.com/gorilla/mux"
+	"github.com/kelseyhightower/envconfig"
 
 	"sa-course-app/pkg/infrastructure/database"
 	"sa-course-app/pkg/user/infrastructure/mysql"
 )
 
-const portEnvVar = "SERVICE_PORT"
+const appName = "saapp"
+
+type Config struct {
+	Port       int    `envconfig:"port"`
+	DbHost     string `envconfig:"db_host"`
+	DbPort     int    `envconfig:"db_port"`
+	DbUser     string `envconfig:"db_user"`
+	DbPassword string `envconfig:"db_password"`
+	DbName     string `envconfig:"db_name"`
+}
 
 func logMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -49,18 +59,13 @@ func buildRouter(appService *app.Service) *mux.Router {
 	return r
 }
 
-func startHttpServer(router *mux.Router) *http.Server {
-	port := os.Getenv(portEnvVar)
-	if _, err := strconv.Atoi(port); err != nil {
-		log.Fatalf("Can not use \"%v\" as HTTP port.", port)
-	}
-
+func startHttpServer(port int, router *mux.Router) *http.Server {
 	s := &http.Server{
-		Addr:    ":" + port,
+		Addr:    ":" + strconv.Itoa(port),
 		Handler: router,
 	}
 
-	log.Printf("Server successfully started on %v port\n", port)
+	log.Printf("Try to start server on %v port...\n", port)
 
 	go func() {
 		log.Fatal(s.ListenAndServe())
@@ -70,14 +75,20 @@ func startHttpServer(router *mux.Router) *http.Server {
 }
 
 func main() {
-	dsn := database.NewDSN("localhost", "3306", "root", "12345Q", "mydb")
-	c, err := database.NewMySQLConnector(dsn)
+	var c Config
+	err := envconfig.Process(appName, &c)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer c.Close()
 
-	userRepository := mysql.NewUserRepository(c.Client())
+	dsn := database.NewDSN(c.DbHost, strconv.Itoa(c.DbPort), c.DbUser, c.DbPassword, c.DbName)
+	conn, err := database.NewMySQLConnector(dsn)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer conn.Close()
+
+	userRepository := mysql.NewUserRepository(conn.Client())
 	appService := app.NewService(userRepository)
 
 	osSignalChan := make(chan os.Signal, 1)
@@ -87,7 +98,7 @@ func main() {
 	defer cancel()
 
 	router := buildRouter(appService)
-	srv := startHttpServer(router)
+	srv := startHttpServer(c.Port, router)
 
 	sig := <-osSignalChan
 	log.Printf("OS signal received: %+v", sig)

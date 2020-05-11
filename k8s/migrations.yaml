@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-migrations
+spec:
+  template:
+    metadata:
+      name: db-migrations
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: db-migrations-job
+          image: andyovch/sa-course-app-migrations:v1
+          imagePullPolicy: "Always"
+          env:
+            - name: DB_HOST
+              value: "mysql"
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_USER
+              value: "root"
+            - name: DB_PASSWORD
+              value: "12345Q"
+            - name: DB_NAME
+              value: "sa-app"
+  backoffLimit: 0

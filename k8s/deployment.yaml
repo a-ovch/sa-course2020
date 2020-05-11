@@ -14,10 +14,21 @@ spec:
     spec:
       containers:
         - name: sa-course-app
-          image: andyovch/sa-course-app:v3
+          image: andyovch/sa-course-app:master
+          imagePullPolicy: "Always"
           env:
-            - name: SERVICE_PORT
+            - name: SAAPP_PORT
               value: "8000"
+            - name: SAAPP_DB_HOST
+              value: "mysql"
+            - name: SAAPP_DB_PORT
+              value: "3306"
+            - name: SAAPP_DB_USER
+              value: "root"
+            - name: SAAPP_DB_PASSWORD
+              value: "12345Q"
+            - name: SAAPP_DB_NAME
+              value: "sa-app"
           ports:
             - name: web
               containerPort: 8000

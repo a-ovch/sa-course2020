@@ -95,6 +95,7 @@ func (h *handlers) getUserHandler(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusNotFound)
 		}
 
+		w.WriteHeader(http.StatusInternalServerError)
 		log.Printf("%v", err)
 		return
 	}
