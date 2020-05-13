@@ -40,7 +40,7 @@ func (h *handlers) createUserHandler(w http.ResponseWriter, r *http.Request) {
 			log.Printf("%v", err)
 		} else {
 			w.WriteHeader(http.StatusCreated)
-			_, _ = fmt.Fprintf(w, "%v", uuid.UUID(id).String())
+			_, _ = fmt.Fprintf(w, "{\"userId\": \"%v\"}", uuid.UUID(id).String())
 		}
 	}
 }
