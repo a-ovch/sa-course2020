@@ -2,3 +2,4 @@
 .env
 
 /build
+/sa-app-chart/charts/*
