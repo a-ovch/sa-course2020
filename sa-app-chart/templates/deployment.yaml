@@ -1,0 +1,68 @@
+{{- $servicePort := 8080 -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "sa-app-chart.fullname" . }}
+  labels:
+    {{- include "sa-app-chart.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "sa-app-chart.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "sa-app-chart.selectorLabels" . | nindent 8 }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/config.yaml") . | sha256sum }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: SAAPP_PORT
+              value: {{ $servicePort | quote }}
+            - name: SAAPP_DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "sa-app-chart.fullname" . }}
+                  key: DB_HOST
+            - name: SAAPP_DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "sa-app-chart.fullname" . }}
+                  key: DB_PORT
+            - name: SAAPP_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "sa-app-chart.fullname" . }}
+                  key: DB_USER
+            - name: SAAPP_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "sa-app-chart.fullname" . }}
+                  key: DB_PASSWORD
+            - name: SAAPP_DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "sa-app-chart.fullname" . }}
+                  key: DB_NAME
+          ports:
+            - name: web
+              containerPort: {{ $servicePort }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: web
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 2
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: web
+            initialDelaySeconds: 10
+            periodSeconds: 5

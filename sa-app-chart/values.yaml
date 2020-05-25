@@ -1,0 +1,34 @@
+replicaCount: 2
+
+image:
+  repository: andyovch/sa-course-app
+  tag: master
+  pullPolicy: Always
+
+migrations:
+  image:
+    repository: andyovch/sa-course-app-migrations
+    tag: v1
+    pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 9000
+
+ingress:
+  hosts:
+    - host: arch.homework
+      paths: [/otusapp($|/)(.*)]
+
+mysql:
+  root:
+    password: toor
+  db:
+    name: sa-app
+    user: sa-app-user
+    password: 12345Q
+  replication:
+    enabled: false
+  nameOverride: db
+  service:
+    type: NodePort

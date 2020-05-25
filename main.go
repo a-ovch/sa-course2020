@@ -6,15 +6,15 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"sa-course-app/pkg/user/app"
 	"strconv"
 	"syscall"
 
+	"sa-course-app/pkg/infrastructure/database"
+	"sa-course-app/pkg/user/app"
+	"sa-course-app/pkg/user/infrastructure/mysql"
+
 	"github.com/gorilla/mux"
 	"github.com/kelseyhightower/envconfig"
-
-	"sa-course-app/pkg/infrastructure/database"
-	"sa-course-app/pkg/user/infrastructure/mysql"
 )
 
 const appName = "saapp"

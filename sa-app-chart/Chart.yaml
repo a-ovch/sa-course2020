@@ -1,0 +1,13 @@
+apiVersion: v2
+name: sa-app-chart
+description: A Helm chart for Software Architect Course application
+
+type: application
+
+version: 0.1.2
+appVersion: 0.0.2
+
+dependencies:
+  - name: mysql
+    version: 6.x.x
+    repository: https://charts.bitnami.com/bitnami
