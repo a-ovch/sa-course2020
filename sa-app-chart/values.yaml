@@ -32,3 +32,4 @@ mysql:
   nameOverride: db
   service:
     type: NodePort
+    port: 3306
